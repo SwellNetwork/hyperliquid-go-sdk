@@ -1,4 +1,4 @@
-package hyperliquid_go_sdk
+package hyperliquid
 
 import (
 	"context"
@@ -49,6 +49,16 @@ func (ts *HTTPClientIntegrationTestSuite) TestFundingHistory() {
 
 	result, err := ts.client.FundingHistory(ctx, params)
 	ts.T().Log("funding history", result)
+
+	ts.NoError(err)
+	ts.NotNil(result)
+}
+
+func (ts *HTTPClientIntegrationTestSuite) TestMeta() {
+	ctx := context.Background()
+
+	result, err := ts.client.Meta(ctx, "")
+	ts.T().Log("meta", result)
 
 	ts.NoError(err)
 	ts.NotNil(result)

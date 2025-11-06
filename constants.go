@@ -1,4 +1,4 @@
-package hyperliquid_go_sdk
+package hyperliquid
 
 const (
 	PathInfo = "/info"
@@ -7,4 +7,5 @@ const (
 const (
 	InfoTypePredictedFundings = "predictedFundings"
 	InfoTypeFundingHistory    = "fundingHistory"
+	InfoTypeMeta              = "meta"
 )

@@ -1,4 +1,4 @@
-package hyperliquid_go_sdk
+package hyperliquid
 
 import (
 	"context"
@@ -72,4 +72,27 @@ func (c *HTTPClient) FundingHistory(ctx context.Context, params FundingHistoryPa
 	}
 
 	return result, nil
+}
+
+func (c *HTTPClient) Meta(ctx context.Context, dex string) (*MetaResult, error) {
+	body := map[string]any{
+		"type": InfoTypeMeta,
+	}
+
+	if len(dex) > 0 {
+		body["dex"] = dex
+	}
+
+	var result MetaResult
+
+	resp, err := c.client.R().SetContext(ctx).SetBody(body).SetResult(&result).Post(PathInfo)
+	if err != nil {
+		return nil, fmt.Errorf("meta request failed: %w", err)
+	}
+
+	if resp.IsError() {
+		return nil, fmt.Errorf("meta request failed: status %d: %s", resp.StatusCode(), resp.String())
+	}
+
+	return &result, nil
 }

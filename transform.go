@@ -1,4 +1,4 @@
-package hyperliquid_go_sdk
+package hyperliquid
 
 import (
 	"fmt"
