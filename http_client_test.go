@@ -32,7 +32,23 @@ func (ts *HTTPClientIntegrationTestSuite) TestPredictedFundings() {
 
 	result, err := ts.client.PredictedFundings(ctx)
 
-	ts.T().Log("result", result)
+	ts.T().Log("predicted fundings", result)
+
+	ts.NoError(err)
+	ts.NotNil(result)
+}
+
+func (ts *HTTPClientIntegrationTestSuite) TestFundingHistory() {
+	ctx := context.Background()
+
+	params := FundingHistoryParams{
+		Coin:      "ETH",
+		StartTime: time.Now().Add(-1 * time.Hour).UnixMilli(),
+		EndTime:   time.Now().UnixMilli(),
+	}
+
+	result, err := ts.client.FundingHistory(ctx, params)
+	ts.T().Log("funding history", result)
 
 	ts.NoError(err)
 	ts.NotNil(result)

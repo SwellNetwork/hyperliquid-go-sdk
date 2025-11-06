@@ -6,4 +6,5 @@ const (
 
 const (
 	InfoTypePredictedFundings = "predictedFundings"
+	InfoTypeFundingHistory    = "fundingHistory"
 )
