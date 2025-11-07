@@ -21,7 +21,7 @@ type predictedFundingsExchange struct {
 type predictedFundingDetails struct {
 	FundingRate          string `json:"fundingRate"`
 	NextFundingTime      int64  `json:"nextFundingTime"`
-	FundingIntervalHours int    `json:"fundingIntervalHours"`
+	FundingIntervalHours int64  `json:"fundingIntervalHours"`
 }
 
 func (p *predictedFundingsCoin) UnmarshalJSON(data []byte) error {
