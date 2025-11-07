@@ -3,15 +3,10 @@ package hyperliquid
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"resty.dev/v3"
 )
 
-type HTTPClientConfig struct {
-	BaseURL string
-	Timeout time.Duration
-}
 type HTTPClient struct {
 	config HTTPClientConfig
 
@@ -21,7 +16,10 @@ type HTTPClient struct {
 func NewHTTPClient(config HTTPClientConfig) *HTTPClient {
 	return &HTTPClient{
 		config: config,
-		client: resty.New().SetBaseURL(config.BaseURL).SetTimeout(config.Timeout).SetHeader("Content-Type", "application/json"),
+		client: resty.New().
+			SetBaseURL(config.BaseURL).
+			SetTimeout(config.Timeout).
+			SetHeader("Content-Type", "application/json"),
 	}
 }
 
