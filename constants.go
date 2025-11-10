@@ -5,7 +5,8 @@ const (
 )
 
 const (
-	InfoTypePredictedFundings = "predictedFundings"
-	InfoTypeFundingHistory    = "fundingHistory"
-	InfoTypeMeta              = "meta"
+	InfoTypePredictedFundings    = "predictedFundings"
+	InfoTypeFundingHistory       = "fundingHistory"
+	InfoTypeMetaAndAssetCtxs     = "metaAndAssetCtxs"
+	InfoTypeSpotMetaAndAssetCtxs = "spotMetaAndAssetCtxs"
 )

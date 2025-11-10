@@ -54,11 +54,20 @@ func (ts *HTTPClientIntegrationTestSuite) TestFundingHistory() {
 	ts.NotNil(result)
 }
 
-func (ts *HTTPClientIntegrationTestSuite) TestMeta() {
+func (ts *HTTPClientIntegrationTestSuite) TestMetaAndAssetCtxs() {
 	ctx := context.Background()
 
-	result, err := ts.client.Meta(ctx, "")
-	ts.T().Log("meta", result)
+	result, err := ts.client.MetaAndAssetCtxs(ctx)
+	ts.T().Log("meta and asset contexts", result[0])
+
+	ts.NoError(err)
+	ts.NotNil(result)
+}
+
+func (ts *HTTPClientIntegrationTestSuite) TestSpotMetaAndAssetCtxsResult() {
+	ctx := context.Background()
+	result, err := ts.client.SpotMetaAndAssetCtxs(ctx)
+	ts.T().Log("spot meta and asset contexts", result[0])
 
 	ts.NoError(err)
 	ts.NotNil(result)
