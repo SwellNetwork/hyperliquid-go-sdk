@@ -2,6 +2,7 @@ package hyperliquid
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 )
 
@@ -31,76 +32,85 @@ func transformPredictedFundingsResult(result predictedFundingsResult) ([]Predict
 	return items, nil
 }
 
-func transformMetaAndAssetCtxsResult(result metaAndAssetCtxsResult) ([]MetaAndAssetCtx, error) {
+func transformMetaAndAssetCtxsResult(result metaAndAssetCtxsResult) (*MetaAndAssetCtx, error) {
 	if len(result.Meta.Universe) != len(result.Assets) {
 		return nil, fmt.Errorf("meta and asset ctxs response mismatch: universe %d assetCtxs %d", len(result.Meta.Universe), len(result.Assets))
 	}
 
-	items := make([]MetaAndAssetCtx, len(result.Meta.Universe))
-	for i := range result.Meta.Universe {
-		uni := result.Meta.Universe[i]
-		asset := result.Assets[i]
-		item := &items[i]
+	meta := Meta{
+		Universe: make([]AssetInfo, len(result.Meta.Universe)),
+	}
 
-		item.Universe.SzDecimals = uni.SzDecimals
-		item.Universe.Name = uni.Name
-		item.Universe.MaxLeverage = uni.MaxLeverage
+	for i, uni := range result.Meta.Universe {
+		meta.Universe[i] = AssetInfo{
+			Name:          uni.Name,
+			SzDecimals:    uni.SzDecimals,
+			MaxLeverage:   uni.MaxLeverage,
+			MarginTableId: uni.MarginTableID,
+			OnlyIsolated:  uni.OnlyIsolated,
+			IsDelisted:    uni.IsDelisted,
+		}
+	}
 
-		marginTable, ok := result.Meta.MarginTables[uni.MarginTableID]
-		if ok {
-			item.MarginTable.Description = marginTable.Description
-			if len(marginTable.MarginTiers) > 0 {
-				item.MarginTable.MarginTiers = make([]struct {
-					LowerBound  string `json:"lowerBound"`
-					MaxLeverage int    `json:"maxLeverage"`
-				}, len(marginTable.MarginTiers))
-				for j, tier := range marginTable.MarginTiers {
-					item.MarginTable.MarginTiers[j].LowerBound = tier.LowerBound
-					item.MarginTable.MarginTiers[j].MaxLeverage = tier.MaxLeverage
-				}
-			} else {
-				item.MarginTable.MarginTiers = nil
-			}
-		} else {
-			item.MarginTable.Description = ""
-			item.MarginTable.MarginTiers = nil
+	if len(result.Meta.MarginTables) > 0 {
+		meta.MarginTables = make([]MarginTable, 0, len(result.Meta.MarginTables))
+
+		tableIDs := make([]int, 0, len(result.Meta.MarginTables))
+		for id := range result.Meta.MarginTables {
+			tableIDs = append(tableIDs, id)
+		}
+		if len(tableIDs) > 1 {
+			sort.Ints(tableIDs)
 		}
 
-		item.AssetCtx.Funding = asset.Funding
-		item.AssetCtx.OpenInterest = asset.OpenInterest
-		item.AssetCtx.PrevDayPx = asset.PrevDayPx
-		item.AssetCtx.DayNtlVlm = asset.DayNtlVlm
-		item.AssetCtx.Premium = asset.Premium
-		item.AssetCtx.OraclePx = asset.OraclePx
-		item.AssetCtx.MarkPx = asset.MarkPx
-		item.AssetCtx.MidPx = asset.MidPx
-		item.AssetCtx.ImpactPxs = asset.ImpactPxs
-		item.AssetCtx.DayBaseVlm = asset.DayBaseVlm
+		for _, id := range tableIDs {
+			marginTable := result.Meta.MarginTables[id]
+			tierCopy := make([]MarginTier, len(marginTable.MarginTiers))
+			for i, tier := range marginTable.MarginTiers {
+				tierCopy[i] = MarginTier(tier)
+			}
+
+			meta.MarginTables = append(meta.MarginTables, MarginTable{
+				ID:          id,
+				Description: marginTable.Description,
+				MarginTiers: tierCopy,
+			})
+		}
 	}
 
-	return items, nil
+	ctxs := make([]AssetCtx, len(result.Assets))
+	for i, asset := range result.Assets {
+		ctxs[i] = AssetCtx(asset)
+	}
+
+	return &MetaAndAssetCtx{
+		Meta: meta,
+		Ctxs: ctxs,
+	}, nil
 }
 
-func transformSpotMetaAndAssetCtxsResult(result spotMetaAndAssetCtxsResult) ([]SpotMetaAndAssetCtx, error) {
-	items := make([]SpotMetaAndAssetCtx, len(result.Meta.Universe))
-	for i := range result.Meta.Universe {
-		uni := result.Meta.Universe[i]
-		asset := result.Assets[i]
-		item := &items[i]
-
-		item.Universe.Name = uni.Name
-		item.Universe.Index = uni.Index
-		item.Universe.IsCanonical = uni.IsCanonical
-
-		item.AssetCtx.PrevDayPx = asset.PrevDayPx
-		item.AssetCtx.DayNtlVlm = asset.DayNtlVlm
-		item.AssetCtx.MarkPx = asset.MarkPx
-		item.AssetCtx.MidPx = asset.MidPx
-		item.AssetCtx.CirculatingSupply = asset.CirculatingSupply
-		item.AssetCtx.Coin = asset.Coin
-		item.AssetCtx.TotalSupply = asset.TotalSupply
-		item.AssetCtx.DayBaseVlm = asset.DayBaseVlm
+func transformSpotMetaAndAssetCtxsResult(result spotMetaAndAssetCtxsResult) (*SpotMetaAndAssetCtx, error) {
+	meta := SpotMeta{
+		Universe: make([]SpotAssetInfo, len(result.Meta.Universe)),
+		Tokens:   result.Meta.Tokens,
 	}
 
-	return items, nil
+	for i, uni := range result.Meta.Universe {
+		meta.Universe[i] = SpotAssetInfo{
+			Tokens:      append([]int(nil), uni.Tokens...),
+			Name:        uni.Name,
+			Index:       uni.Index,
+			IsCanonical: uni.IsCanonical,
+		}
+	}
+
+	ctxs := make([]SpotAssetCtx, len(result.Assets))
+	for i, asset := range result.Assets {
+		ctxs[i] = SpotAssetCtx(asset)
+	}
+
+	return &SpotMetaAndAssetCtx{
+		Meta: meta,
+		Ctxs: ctxs,
+	}, nil
 }

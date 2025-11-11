@@ -58,7 +58,7 @@ func (ts *HTTPClientIntegrationTestSuite) TestMetaAndAssetCtxs() {
 	ctx := context.Background()
 
 	result, err := ts.client.MetaAndAssetCtxs(ctx)
-	ts.T().Log("meta and asset contexts", result[0])
+	ts.T().Log("meta and asset contexts", len(result.Meta.Universe))
 
 	ts.NoError(err)
 	ts.NotNil(result)
@@ -67,7 +67,7 @@ func (ts *HTTPClientIntegrationTestSuite) TestMetaAndAssetCtxs() {
 func (ts *HTTPClientIntegrationTestSuite) TestSpotMetaAndAssetCtxsResult() {
 	ctx := context.Background()
 	result, err := ts.client.SpotMetaAndAssetCtxs(ctx)
-	ts.T().Log("spot meta and asset contexts", result[0])
+	ts.T().Log("spot meta and asset contexts", len(result.Ctxs))
 
 	ts.NoError(err)
 	ts.NotNil(result)

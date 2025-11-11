@@ -27,45 +27,29 @@ type predictedFundingDetails struct {
 }
 
 func (p *predictedFundingsCoin) UnmarshalJSON(data []byte) error {
-	var payload []json.RawMessage
+	var payload [2]json.RawMessage
 	if err := json.Unmarshal(data, &payload); err != nil {
-		return err
-	}
-
-	if len(payload) != 2 {
-		return fmt.Errorf("predicted fundings coin entry format invalid: expected 2 elements, got %d", len(payload))
+		return fmt.Errorf("decode predicted fundings coin: %w", err)
 	}
 
 	if err := json.Unmarshal(payload[0], &p.Coin); err != nil {
 		return err
 	}
 
-	if err := json.Unmarshal(payload[1], &p.Exchanges); err != nil {
-		return err
-	}
-
-	return nil
+	return json.Unmarshal(payload[1], &p.Exchanges)
 }
 
 func (p *predictedFundingsExchange) UnmarshalJSON(data []byte) error {
-	var payload []json.RawMessage
+	var payload [2]json.RawMessage
 	if err := json.Unmarshal(data, &payload); err != nil {
-		return err
-	}
-
-	if len(payload) != 2 {
-		return fmt.Errorf("predicted fundings exchange entry format invalid: expected 2 elements, got %d", len(payload))
+		return fmt.Errorf("decode predicted fundings exchange: %w", err)
 	}
 
 	if err := json.Unmarshal(payload[0], &p.Exchange); err != nil {
 		return err
 	}
 
-	if err := json.Unmarshal(payload[1], &p.Details); err != nil {
-		return err
-	}
-
-	return nil
+	return json.Unmarshal(payload[1], &p.Details)
 }
 
 // Perp meta & asset ctxs
@@ -76,13 +60,9 @@ type metaAndAssetCtxsResult struct {
 }
 
 func (m *metaAndAssetCtxsResult) UnmarshalJSON(data []byte) error {
-	var payload []json.RawMessage
+	var payload [2]json.RawMessage
 	if err := json.Unmarshal(data, &payload); err != nil {
 		return err
-	}
-
-	if len(payload) != 2 {
-		return fmt.Errorf("meta and asset ctxs response malformed: expected 2 entries, got %d", len(payload))
 	}
 
 	if err := json.Unmarshal(payload[0], &m.Meta); err != nil {
@@ -107,6 +87,8 @@ type metaAndAssetCtxUniverse struct {
 	Name          string `json:"name"`
 	MaxLeverage   int    `json:"maxLeverage"`
 	MarginTableID int    `json:"marginTableId"`
+	OnlyIsolated  bool   `json:"onlyIsolated,omitempty"`
+	IsDelisted    bool   `json:"isDelisted,omitempty"`
 }
 
 type marginTableMap map[int]marginTableDetails
@@ -124,13 +106,9 @@ func (m *marginTableMap) UnmarshalJSON(data []byte) error {
 
 	result := make(marginTableMap, len(entries))
 	for _, raw := range entries {
-		var payload []json.RawMessage
+		var payload [2]json.RawMessage
 		if err := json.Unmarshal(raw, &payload); err != nil {
 			return err
-		}
-
-		if len(payload) != 2 {
-			return fmt.Errorf("margin table entry format invalid: expected 2 elements, got %d", len(payload))
 		}
 
 		var id int
@@ -150,12 +128,14 @@ func (m *marginTableMap) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type marginTierPayload struct {
+	LowerBound  string `json:"lowerBound"`
+	MaxLeverage int    `json:"maxLeverage"`
+}
+
 type marginTableDetails struct {
-	Description string `json:"description"`
-	MarginTiers []struct {
-		LowerBound  string `json:"lowerBound"`
-		MaxLeverage int    `json:"maxLeverage"`
-	} `json:"marginTiers"`
+	Description string              `json:"description"`
+	MarginTiers []marginTierPayload `json:"marginTiers"`
 }
 
 type assetCtxPayload struct {
@@ -179,13 +159,9 @@ type spotMetaAndAssetCtxsResult struct {
 }
 
 func (r *spotMetaAndAssetCtxsResult) UnmarshalJSON(data []byte) error {
-	var payload []json.RawMessage
+	var payload [2]json.RawMessage
 	if err := json.Unmarshal(data, &payload); err != nil {
 		return err
-	}
-
-	if len(payload) != 2 {
-		return fmt.Errorf("spot meta and asset ctxs response malformed: expected 2 entries, got %d", len(payload))
 	}
 
 	if err := json.Unmarshal(payload[0], &r.Meta); err != nil {
@@ -201,19 +177,21 @@ func (r *spotMetaAndAssetCtxsResult) UnmarshalJSON(data []byte) error {
 
 type spotMetaAndAssetCtxMeta struct {
 	Universe []spotMetaAndAssetCtxUniverse `json:"universe"`
+	Tokens   []SpotTokenInfo               `json:"tokens"`
 }
 
 type spotMetaAndAssetCtxUniverse struct {
+	Tokens      []int  `json:"tokens"`
 	Name        string `json:"name"`
 	Index       int    `json:"index"`
 	IsCanonical bool   `json:"isCanonical"`
 }
 
 type spotAssetCtxPayload struct {
-	PrevDayPx         string `json:"prevDayPx"`
 	DayNtlVlm         string `json:"dayNtlVlm"`
 	MarkPx            string `json:"markPx"`
 	MidPx             string `json:"midPx"`
+	PrevDayPx         string `json:"prevDayPx"`
 	CirculatingSupply string `json:"circulatingSupply"`
 	Coin              string `json:"coin"`
 	TotalSupply       string `json:"totalSupply"`
