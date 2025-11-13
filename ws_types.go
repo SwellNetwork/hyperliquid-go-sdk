@@ -1,13 +1,39 @@
 package hyperliquid
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/goccy/go-json"
 )
 
+type sharedSubscriptionFinder func(string) (*sharedSubscription, bool)
+type callback func(any)
+
 type subscriptable interface {
 	Key() string
+}
+
+func subscribeTyped[T any](
+	c *WSClient,
+	payload subscriptable,
+	callback func(T, error),
+) (*Subscription, error) {
+	if callback == nil {
+		return nil, fmt.Errorf("callback cannot be nil")
+	}
+
+	var zero T
+
+	return c.subscribe(payload, func(msg any) {
+		typed, ok := msg.(T)
+		if !ok {
+			callback(zero, fmt.Errorf("invalid message type: %T", msg))
+			return
+		}
+
+		callback(typed, nil)
+	})
 }
 
 type wsCommand struct {
@@ -39,7 +65,6 @@ const (
 	//ChannelUserFills      wsChannel = "userFills"
 	//ChannelWebData2       wsChannel = "webData2"
 	//ChannelBbo            wsChannel = "bbo"
-	//ChannelSubResponse    wsChannel = "subscriptionResponse"
 )
 
 type Subscription struct {
@@ -48,6 +73,6 @@ type Subscription struct {
 	Close   func()
 }
 
-func key(args ...string) string {
+func genKey(args ...string) string {
 	return strings.Join(args, ":")
 }

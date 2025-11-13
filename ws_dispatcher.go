@@ -6,8 +6,6 @@ import (
 	"github.com/goccy/go-json"
 )
 
-type sharedSubscriptionFinder func(string) (*sharedSubscription, bool)
-
 type dispatcher func(find sharedSubscriptionFinder, msg wsMessage) error
 
 func newChannelDispatcher[T subscriptable](channel wsChannel) dispatcher {

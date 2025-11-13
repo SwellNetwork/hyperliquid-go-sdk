@@ -25,7 +25,7 @@ type (
 )
 
 func (a ActiveAssetCtx) Key() string {
-	return key(string(ChannelActiveAssetCtx), a.Coin)
+	return genKey(string(ChannelActiveAssetCtx), a.Coin)
 }
 
 type activeAssetCtxSubscriptionPayload struct {
@@ -34,7 +34,7 @@ type activeAssetCtxSubscriptionPayload struct {
 }
 
 func (p activeAssetCtxSubscriptionPayload) Key() string {
-	return key(string(ChannelActiveAssetCtx), p.Coin)
+	return genKey(string(ChannelActiveAssetCtx), p.Coin)
 }
 
 func (c *WSClient) ActiveAssetCtx(

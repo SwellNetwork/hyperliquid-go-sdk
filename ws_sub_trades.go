@@ -21,7 +21,7 @@ func (t Trades) Key() string {
 	if len(t) == 0 {
 		return ""
 	}
-	return key(string(ChannelTrades), t[0].Coin)
+	return genKey(string(ChannelTrades), t[0].Coin)
 }
 
 type tradeSubscriptionPayload struct {
@@ -30,7 +30,7 @@ type tradeSubscriptionPayload struct {
 }
 
 func (p tradeSubscriptionPayload) Key() string {
-	return key(string(ChannelTrades), p.Coin)
+	return genKey(string(ChannelTrades), p.Coin)
 }
 
 func (c *WSClient) Trades(

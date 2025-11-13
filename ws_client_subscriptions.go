@@ -19,7 +19,7 @@ func (c *WSClient) subscribe(
 	pkey := payload.Key()
 	s, exists := c.sharedSubscriptionByKey[pkey]
 	if !exists {
-		s = newSubscriber(
+		s = newSharedSubscription(
 			pkey,
 			payload,
 			func(p subscriptable) {
@@ -52,28 +52,6 @@ func (c *WSClient) subscribe(
 			s.removeSubscriber(subscriberID)
 		},
 	}, nil
-}
-
-func subscribeTyped[T any](
-	c *WSClient,
-	payload subscriptable,
-	callback func(T, error),
-) (*Subscription, error) {
-	if callback == nil {
-		return nil, fmt.Errorf("callback cannot be nil")
-	}
-
-	var zero T
-
-	return c.subscribe(payload, func(msg any) {
-		typed, ok := msg.(T)
-		if !ok {
-			callback(zero, fmt.Errorf("invalid message type: %T", msg))
-			return
-		}
-
-		callback(typed, nil)
-	})
 }
 
 func (c *WSClient) resubscribeAll() error {

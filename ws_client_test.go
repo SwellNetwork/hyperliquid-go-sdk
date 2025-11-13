@@ -30,7 +30,7 @@ func (ts *WSClientIntegrationTestSuite) TestTrade() {
 	defer cancel()
 
 	ts.T().Log("Connecting to websocket")
-	if err := ts.client.Dial(ctx); err != nil {
+	if err := ts.client.Connect(ctx); err != nil {
 		ts.T().Fatalf("Failed to connect: %v", err)
 	}
 	defer ts.client.Close()
@@ -63,7 +63,7 @@ func (ts *WSClientIntegrationTestSuite) TestActiveAssetCtx() {
 	defer cancel()
 
 	ts.T().Log("Connecting to websocket")
-	if err := ts.client.Dial(ctx); err != nil {
+	if err := ts.client.Connect(ctx); err != nil {
 		ts.T().Fatalf("Failed to connect: %v", err)
 	}
 	defer ts.client.Close()
@@ -84,6 +84,6 @@ func (ts *WSClientIntegrationTestSuite) TestActiveAssetCtx() {
 	ts.T().Log("Subscribed to active asset context")
 	defer sub.Close()
 
-	<-time.After(time.Second * 10)
+	<-time.After(time.Second * 5)
 	ts.T().Log("Unsubscribing from active asset context")
 }
