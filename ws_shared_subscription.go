@@ -2,8 +2,6 @@ package hyperliquid
 
 import "sync"
 
-type callback func(any)
-
 type sharedSubscription struct {
 	id                  string
 	count               int64
@@ -15,7 +13,7 @@ type sharedSubscription struct {
 	mu sync.RWMutex
 }
 
-func newSubscriber(
+func newSharedSubscription(
 	id string,
 	payload subscriptable,
 	subscriberFunc, unsubscriberFunc func(subscriptable),

@@ -66,7 +66,7 @@ func NewWSClient(config WSClientConfig, opts ...WSClientOption) *WSClient {
 	return client
 }
 
-func (c *WSClient) Dial(ctx context.Context) error {
+func (c *WSClient) Connect(ctx context.Context) error {
 	return c.connect(ctx)
 }
 

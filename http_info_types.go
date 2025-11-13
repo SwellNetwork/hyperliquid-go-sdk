@@ -90,10 +90,26 @@ type (
 )
 
 type (
+	FundingHistoryParams struct {
+		Coin      string
+		StartTime int64
+		EndTime   int64
+	}
+
 	FundingHistory struct {
 		Coin        string `json:"coin"`
 		FundingRate string `json:"fundingRate"`
 		Premium     string `json:"premium"`
 		Time        int64  `json:"time"`
+	}
+)
+
+type (
+	PredictedFunding struct {
+		Coin                 string
+		Exchange             string
+		FundingRates         float64
+		NextFundingTime      int64
+		FundingIntervalHours int64
 	}
 )

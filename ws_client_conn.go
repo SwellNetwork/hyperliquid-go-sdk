@@ -42,9 +42,12 @@ func (c *WSClient) connect(ctx context.Context) error {
 	c.conn = conn
 	c.mu.Unlock()
 
-	if err := c.resubscribeAll(); err != nil {
+	if err = c.resubscribeAll(); err != nil {
 		c.logger.Errorf("failed to replay subscriptions: %v", err)
-		c.dropActiveConnection()
+
+		if dropActiveConnErr := c.dropActiveConnection(); dropActiveConnErr != nil {
+			c.logger.Errorf("failed to drop active connections: %v", dropActiveConnErr)
+		}
 		return err
 	}
 
@@ -156,16 +159,16 @@ func (c *WSClient) reconnect(ctx context.Context) {
 }
 
 func (c *WSClient) dispatch(msg wsMessage) error {
-	d, ok := c.dispatcherByChannel[msg.Channel]
-	if !ok {
+	d, dispatcherFound := c.dispatcherByChannel[msg.Channel]
+	if !dispatcherFound {
 		return fmt.Errorf("no dispatcher for channel: %s", msg.Channel)
 	}
 
 	finder := func(key string) (*sharedSubscription, bool) {
 		c.mu.RLock()
 		defer c.mu.RUnlock()
-		s, ok := c.sharedSubscriptionByKey[key]
-		return s, ok
+		s, sharedSubscriptionFound := c.sharedSubscriptionByKey[key]
+		return s, sharedSubscriptionFound
 	}
 
 	return d(finder, msg)
