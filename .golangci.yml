@@ -1,28 +1,32 @@
+version: "2"
+
 run:
   timeout: 5m
-  skip-files:
-    - ".*_test\\.go"
 
 linters:
-  disable-all: true
+  default: none
   enable:
     - errcheck
-    - gofmt
-    - goimports
-    - gosimple
     - govet
     - ineffassign
     - revive
     - staticcheck
-    - typecheck
+  exclusions:
+    paths:
+      - ".*_test\\.go"
+  settings:
+    revive:
+      confidence: 0.8
 
-linters-settings:
-  goimports:
-    local-prefixes: github.com/SwellNetwork/hyperliquid-go-sdk
-  revive:
-    confidence: 0.8
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/SwellNetwork/hyperliquid-go-sdk
 
 issues:
-  exclude-use-default: false
   max-issues-per-linter: 0
   max-same-issues: 0
