@@ -68,9 +68,21 @@ const (
 )
 
 type Subscription struct {
-	ID      string
-	Payload any
-	Close   func()
+	id      string
+	payload any
+	close   func()
+}
+
+func (s *Subscription) GetID() string {
+	return s.id
+}
+
+func (s *Subscription) GetPayload() any {
+	return s.payload
+}
+
+func (s *Subscription) Close() {
+	s.Close()
 }
 
 func genKey(args ...string) string {
