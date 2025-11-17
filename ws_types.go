@@ -82,7 +82,7 @@ func (s *Subscription) GetPayload() any {
 }
 
 func (s *Subscription) Close() {
-	s.Close()
+	s.close()
 }
 
 func genKey(args ...string) string {
