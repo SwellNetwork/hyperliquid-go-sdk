@@ -1,6 +1,6 @@
 module github.com/SwellNetwork/hyperliquid-go-sdk
 
-go 1.24.5
+go 1.25.0
 
 require (
 	github.com/goccy/go-json v0.10.5
@@ -27,8 +27,8 @@ require (
 	go.elastic.co/apm/module/apmzerolog/v2 v2.7.1 // indirect
 	go.elastic.co/apm/v2 v2.7.1 // indirect
 	go.elastic.co/fastjson v1.5.1 // indirect
-	golang.org/x/net v0.47.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	howett.net/plist v1.0.1 // indirect
